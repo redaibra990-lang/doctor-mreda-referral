@@ -17,46 +17,20 @@ body:after{width:280px;height:280px;background:#21d9ff;right:-80px;bottom:5%;ani
 .badge{animation:pulse 2.4s ease-in-out infinite}
 .primary{position:relative;overflow:hidden}
 .primary:after{content:"";position:absolute;top:-40%;left:-70%;width:45%;height:180%;background:#ffffff35;transform:skewX(-20deg);animation:shine 3.2s infinite}
-.card{transition:transform .35s,box-shadow .35s}.card:hover{transform:translateY(-5px);box-shadow:0 28px 90px #0008}
+.card:hover{transform:translateY(-3px);transition:.35s}
 @keyframes rise{from{opacity:0;transform:translateY(28px) scale(.98)}to{opacity:1;transform:none}}
 @keyframes pulse{0%,100%{box-shadow:0 0 0 0 #8c7dff18}50%{box-shadow:0 0 0 10px #8c7dff00}}
 @keyframes shine{0%{left:-70%}55%,100%{left:140%}}
 @keyframes orb1{to{transform:translate(90px,50px) scale(1.18)}}
 @keyframes orb2{to{transform:translate(-80px,-55px) scale(1.12)}}
 </style>
-
-<style>
-.heroText,.login{position:relative;overflow:hidden}
-.heroText:before,.login:before{content:"";position:absolute;width:260px;height:260px;border-radius:50%;background:radial-gradient(circle,#8b7dff35,transparent 68%);top:-150px;right:-110px;animation:floatGlow 5s ease-in-out infinite alternate;pointer-events:none}
-.heroText:after{content:"";position:absolute;width:180px;height:180px;border-radius:50%;background:radial-gradient(circle,#50ddff25,transparent 70%);bottom:-110px;left:-80px;animation:floatGlow2 6s ease-in-out infinite alternate;pointer-events:none}
-.logo{animation:logoIn .9s cubic-bezier(.2,.9,.2,1) both}
-h1{animation:titleIn 1s .12s cubic-bezier(.2,.9,.2,1) both}
-.sub{animation:titleIn 1s .24s cubic-bezier(.2,.9,.2,1) both}
-.cta{animation:titleIn 1s .36s cubic-bezier(.2,.9,.2,1) both}
-.login{animation:loginIn 1s .18s cubic-bezier(.2,.9,.2,1) both}
-input{transition:.25s;transform:translateZ(0)}
-input:focus{transform:scale(1.015);box-shadow:0 0 28px #7767ff25}
-.primary{transition:.25s;transform:translateY(0)}
-.primary:hover{transform:translateY(-4px) scale(1.025);box-shadow:0 16px 38px #6d61ff55}
-.secondary{transition:.25s}
-.secondary:hover{transform:translateY(-3px);border-color:#7569ff88}
-.badge{animation:badgePulse 2s ease-in-out infinite}
-.pill{animation:pillFloat 3s ease-in-out infinite}
-@keyframes logoIn{from{opacity:0;transform:translateY(-18px) scale(.85)}to{opacity:1;transform:none}}
-@keyframes titleIn{from{opacity:0;transform:translateY(25px)}to{opacity:1;transform:none}}
-@keyframes loginIn{from{opacity:0;transform:translateX(35px) scale(.96)}to{opacity:1;transform:none}}
-@keyframes floatGlow{to{transform:translate(-35px,55px) scale(1.3)}}
-@keyframes floatGlow2{to{transform:translate(40px,-30px) scale(1.25)}}
-@keyframes badgePulse{0%,100%{transform:scale(1);filter:brightness(1)}50%{transform:scale(1.045);filter:brightness(1.35)}}
-@keyframes pillFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
-</style>
 </head>
 <body>
 <div class="wrap">
-<nav><div class="logo">RV <span>STORE ⚡️</span></div><div class="pill">🎮 RV STORE ⚡️</div></nav>
+<nav><div class="logo">RV <span>STORE ⚡️</span></div><div class="pill">🎮 متجر ألعاب • V1</div></nav>
 <section class="hero">
 <div class="card heroText">
-<div class="badge">⚡ RV STORE ⚡️</div>
+<div class="badge">⚡ RV STORE • Gaming Hub</div>
 <h1>اشحن لعبتك<br><span>بسرعة وبسهولة 🎮</span></h1>
 <p class="sub">حسابك في RV STORE يجمع الشحنات، الطلبات، العروض والمكافآت في مكان واحد.</p>
 <div class="cta"><button class="primary" onclick="document.getElementById('email').focus()">🚀 إنشاء حساب</button><button class="secondary" onclick="document.getElementById('how').scrollIntoView({behavior:'smooth'})">✨ اكتشف المتجر</button></div>
@@ -109,7 +83,7 @@ window.requestOtp = async function(){
   const email = $('email').value.trim().toLowerCase();
   const phone = $('phone').value.trim();
   if(!email || !email.includes('@')) return message('⚠️ اكتب إيميل صحيح.','err');
-  if(!/^01\\d{9}$/.test(phone)) return message('⚠️ اكتب رقم موبايل مصري صحيح.','err');
+  if(!/^01\d{9}$/.test(phone)) return message('⚠️ اكتب رقم موبايل مصري صحيح.','err');
 
   $('sendBtn').disabled = true;
   $('sendBtn').textContent = '⏳ جاري الإرسال...';
@@ -133,7 +107,7 @@ window.requestOtp = async function(){
 window.verifyOtp = async function(){
   const email = localStorage.getItem('rv_pending_email') || $('email').value.trim().toLowerCase();
   const token = $('otp').value.trim();
-  if(!/^\\d{6}$/.test(token)) return message('⚠️ اكتب كود الـOTP المكوّن من 6 أرقام.','err');
+  if(!/^\d{6}$/.test(token)) return message('⚠️ اكتب كود الـOTP المكوّن من 6 أرقام.','err');
 
   $('verifyBtn').disabled = true;
   $('verifyBtn').textContent = '⏳ جاري التحقق...';
