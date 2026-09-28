@@ -87,6 +87,26 @@ window.requestOtp = async function(){
 
   $('sendBtn').disabled = true;
   $('sendBtn').textContent = '⏳ جاري الإرسال...';
+  // منع استخدام رقم موبايل مسجل بالفعل
+  const { data: existingProfile, error: phoneCheckError } = await supabase
+    .from('profiles')
+    .select('user_id')
+    .eq('phone', phone)
+    .maybeSingle();
+
+  if(phoneCheckError) return message('❌ حصل خطأ في التحقق من رقم الموبايل.','err');
+  if(existingProfile) return message('⚠️ رقم الموبايل ده مستخدم بالفعل بحساب تاني.','err');
+
+  // منع استخدام رقم موبايل مسجل بالفعل
+  const { data: existingProfile, error: phoneCheckError } = await supabase
+    .from('profiles')
+    .select('user_id')
+    .eq('phone', phone)
+    .maybeSingle();
+
+  if(phoneCheckError) return message('❌ حصل خطأ في التحقق من رقم الموبايل.','err');
+  if(existingProfile) return message('⚠️ رقم الموبايل ده مستخدم بالفعل بحساب تاني.','err');
+
   const { error } = await supabase.auth.signInWithOtp({
     email,
     options: { shouldCreateUser: true }
@@ -119,9 +139,19 @@ window.verifyOtp = async function(){
 
   localStorage.removeItem('rv_pending_email');
   const user = data.user;
+  // حفظ رقم الموبايل وربطه بالحساب بعد نجاح OTP
+  const phone = localStorage.getItem('rv_pending_phone') || '';
+  if(phone){
+    const { error: profileError } = await supabase
+      .from('profiles')
+      .upsert({ user_id: user.id, phone }, { onConflict: 'user_id' });
+
+    if(profileError) return message('❌ تم التحقق من الإيميل لكن حصل خطأ في حفظ رقم الموبايل.','err');
+  }
+
+  localStorage.removeItem('rv_pending_phone');
   $('mail').textContent = user?.email || email;
   $('dash').classList.remove('hidden');
-  $('ref').value = location.origin + '/?ref=' + (user?.id ? user.id.slice(0,8).toUpperCase() : 'RVSTORE');
   $('dash').scrollIntoView({behavior:'smooth'});
   message('🎉 تم التحقق من الإيميل وتسجيل الدخول بنجاح. أهلاً بيك في RV STORE!','ok');
 };
