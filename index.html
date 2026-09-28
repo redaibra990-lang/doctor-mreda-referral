@@ -1,0 +1,190 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>DOCTOR MReda ⚡️ | مسابقة Royal Pass</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+*{box-sizing:border-box} body{margin:0;background:#080b10;color:#fff;font-family:Arial,sans-serif}
+.wrap{max-width:680px;margin:auto;padding:24px 16px 50px}
+.card{background:#121821;border:1px solid #263140;border-radius:20px;padding:22px;margin:14px 0;box-shadow:0 8px 30px #0005}
+h1{margin:0 0 8px;font-size:28px} h2{margin-top:0}
+.muted{color:#9ba8b7;line-height:1.7}
+.btn{width:100%;border:0;border-radius:13px;padding:14px;margin-top:10px;background:#25d366;color:#06160b;font-weight:800;font-size:16px;cursor:pointer}
+.secondary{background:#263140;color:#fff}
+input{width:100%;padding:14px;border-radius:12px;border:1px solid #334155;background:#0a0f15;color:#fff;font-size:16px;margin:7px 0}
+.ref{background:#0a0f15;border:1px dashed #25d366;padding:14px;border-radius:12px;word-break:break-all}
+.row{display:flex;justify-content:space-between;gap:10px;padding:12px 0;border-bottom:1px solid #25303c}
+.rank{width:32px} .name{flex:1} .num{font-weight:800}
+.note{font-size:13px;color:#8895a5;line-height:1.6}
+.ok{color:#67e8a5} .err{color:#ff8b8b}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="card">
+    <h1>DOCTOR MReda ⚡️</h1>
+    <p>🎮 مسابقة إحالات — اكسب دخول <b>روم Royal Pass 🤠</b></p>
+    <p class="muted">تابع القناة، اعمل رابطك، وشاركه مع أصحابك. كل تسجيل حقيقي من رابطك يتحسب لك.</p>
+    <a class="btn" href="https://whatsapp.com/channel/0029VbBZZj1Jf05fRSysS42K" target="_blank" rel="noopener">📲 متابعة قناة الواتساب</a>
+  </div>
+
+  <div class="card">
+    <h2>🔗 اعمل رابط الإحالة</h2>
+    <input id="name" maxlength="40" placeholder="اكتب اسمك أو ID بتاعك">
+    <button class="btn" id="create">إنشاء رابط الإحالة</button>
+    <div id="message"></div>
+    <div id="confirmBox" hidden style="margin-top:14px;padding:14px;border:1px solid #334155;border-radius:14px;background:#0a0f15">
+      <p class="muted" style="margin:0 0 8px">⚠️ دخلت من رابط إحالة؟ افتح القناة وانضم إليها أولًا، وبعدها اضغط التأكيد.</p>
+      <a class="btn" style="display:block;text-align:center;text-decoration:none;margin-top:8px" href="https://whatsapp.com/channel/0029VbBZZj1Jf05fRSysS42K" target="_blank" rel="noopener">📲 افتح قناة الواتساب وانضم</a>
+      <button class="btn secondary" id="confirm" type="button">✅ تأكيد الانضمام</button>
+      <p id="confirmMsg" class="note"></p>
+    </div>
+    <div id="myref" hidden>
+      <p class="ok">✅ رابطك اتعمل:</p>
+      <div class="ref" id="link"></div>
+      <button class="btn secondary" id="copy">📋 نسخ الرابط</button>
+      <button class="btn" id="share">📤 مشاركة الرابط</button>
+      <p id="count" class="muted"></p>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>🏆 المتصدرين</h2>
+    <div id="board"><p class="muted">جاري التحميل...</p></div>
+    <button class="btn secondary" id="refresh">🔄 تحديث الترتيب</button>
+  </div>
+
+  <div class="card">
+    <h2>📋 الشروط</h2>
+    <ol class="muted">
+      <li>متابعة قناة DOCTOR MReda ⚡️.</li>
+      <li>إنشاء رابط إحالة من الصفحة ومشاركته.</li>
+      <li>الإحالة لا تُحسب إلا بعد تأكيد الانضمام للقناة.</li>
+      <li>الحسابات الوهمية والتكرار ومحاولات الغش لا تُحتسب.</li>
+      <li>يتم التحقق من الفائز قبل تسليم جائزة روم Royal Pass.</li>
+    </ol>
+    <p class="note">ملاحظة: واتساب لا يتيح للصفحة التحقق تلقائيًا من عضوية القناة. زر التأكيد هو خطوة يدوية بعد الانضمام، والعداد لا يزيد قبلها.</p>
+  </div>
+</div>
+
+<script>
+const SUPABASE_URL = "https://nacizdrhjqadpksvyuhh.supabase.co";
+const SUPABASE_KEY = "sb_publishable_y3PnNMDMVESU3QDQjr6PUw_5m_idYyK";
+const { createClient } = supabase;
+const db = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+const channelUrl = "https://whatsapp.com/channel/0029VbBZZj1Jf05fRSysS42K";
+const params = new URLSearchParams(location.search);
+const incomingRef = (params.get("ref") || "").trim().toUpperCase();
+
+function getVisitorId(){
+  let id = localStorage.getItem("doctor_mreda_visitor_id");
+  if(!id){
+    id = crypto.randomUUID ? crypto.randomUUID() : "v-"+Date.now()+"-"+Math.random().toString(36).slice(2);
+    localStorage.setItem("doctor_mreda_visitor_id", id);
+  }
+  return id;
+}
+
+function showMsg(text, ok=false){
+  const el=document.getElementById("message");
+  el.className=ok ? "ok" : "err";
+  el.textContent=text;
+}
+
+function makeShareText(link){
+  return "🔥 مسابقة DOCTOR MReda ⚡️\n\nادخل من رابط الإحالة بتاعي وشارك في سحب روم Royal Pass 🤠\n\n"+link;
+}
+
+async function createReferral(){
+  const name=document.getElementById("name").value.trim();
+  if(name.length<2){ showMsg("اكتب اسم أو ID صحيح."); return; }
+
+  const {data,error} = await db.rpc("register_referral", {
+    p_username:name,
+    p_visitor_id:getVisitorId(),
+    p_referred_by:incomingRef || null
+  });
+
+  if(error){ showMsg("حصل خطأ. جرّب تاني بعد لحظات."); console.error(error); return; }
+
+  const row=data?.[0];
+  if(!row){ showMsg("لم يتم إنشاء الرابط."); return; }
+
+  const link = location.origin + location.pathname + "?ref=" + encodeURIComponent(row.referral_code);
+  localStorage.setItem("doctor_mreda_referral_code", row.referral_code);
+  localStorage.setItem("doctor_mreda_name", row.username);
+
+  document.getElementById("link").textContent=link;
+  document.getElementById("myref").hidden=false;
+  document.getElementById("count").textContent="إحالاتك المؤكدة: "+(row.referrals ?? 0);
+  showMsg(row.is_new ? "تم إنشاء رابطك بنجاح ❤️" : "ده رابطك الحالي ❤️", true);
+  document.getElementById("create").textContent="تحديث الرابط";
+
+  // If this visitor came through someone else's referral, show the confirmation step.
+  const confirmBox=document.getElementById("confirmBox");
+  if(incomingRef && row.referral_code && !row.confirmed){
+    confirmBox.hidden=false;
+  } else {
+    confirmBox.hidden=true;
+  }
+  if(row.confirmed){
+    document.getElementById("confirmMsg").textContent="✅ تم تأكيد انضمامك بالفعل.";
+  }
+  loadBoard();
+}
+
+async function loadBoard(){
+  const el=document.getElementById("board");
+  const {data,error}=await db.rpc("get_leaderboard");
+  if(error){ el.innerHTML='<p class="err">تعذر تحميل الترتيب.</p>'; console.error(error); return; }
+  if(!data?.length){ el.innerHTML='<p class="muted">لسه مفيش مشاركين. كن أول واحد 🤠</p>'; return; }
+  el.innerHTML=data.slice(0,20).map((r,i)=>`
+    <div class="row">
+      <span class="rank">${i+1}</span>
+      <span class="name">${escapeHtml(r.username)}</span>
+      <span class="num">${r.referrals} إحالة</span>
+    </div>`).join("");
+}
+
+function escapeHtml(s){
+  return String(s).replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]));
+}
+
+document.getElementById("create").onclick=createReferral;
+document.getElementById("refresh").onclick=loadBoard;
+document.getElementById("confirm").onclick=async()=>{
+  const btn=document.getElementById("confirm");
+  const msg=document.getElementById("confirmMsg");
+  btn.disabled=true;
+  msg.textContent="جاري التأكيد...";
+  const {data,error}=await db.rpc("confirm_referral",{p_visitor_id:getVisitorId()});
+  btn.disabled=false;
+  if(error){ msg.textContent="❌ حصل خطأ: "+(error.message||"حاول تاني"); return; }
+  msg.textContent="✅ تم التأكيد! لو دخلت من رابط إحالة، اتحسبت الإحالة لصاحب الرابط.";
+  document.getElementById("confirmBox").hidden=true;
+  loadBoard();
+};
+document.getElementById("copy").onclick=async()=>{
+  const link=document.getElementById("link").textContent;
+  await navigator.clipboard.writeText(link);
+  document.getElementById("copy").textContent="✅ اتنسخ";
+  setTimeout(()=>document.getElementById("copy").textContent="📋 نسخ الرابط",1500);
+};
+document.getElementById("share").onclick=()=>{
+  const link=document.getElementById("link").textContent;
+  const text=makeShareText(link);
+  if(navigator.share) navigator.share({title:"DOCTOR MReda ⚡️",text,url:link});
+  else window.open("https://wa.me/?text="+encodeURIComponent(text),"_blank");
+};
+
+(function(){
+  const saved=localStorage.getItem("doctor_mreda_name");
+  if(saved) document.getElementById("name").value=saved;
+  loadBoard();
+})();
+</script>
+</body>
+</html>
